@@ -2,6 +2,7 @@ const UserRepository = require('../repository/user-repository');
 const jwt = require('jsonwebtoken');
 const { JWT_KEY } = require('../config/serverConfig');
 const bcrypt = require('bcrypt');
+const { use } = require('../routes');
 
 class UserService {
     constructor(){
@@ -20,11 +21,38 @@ class UserService {
 
     async signIn(email,plainPassword){
         try {
-            
+            const user = await this.userRepository.getByEmail(email);
+            const passwordsMatch = this.checkPassword(plainPassword,user.password);
+            if(!passwordsMatch){
+                console.log("Password doesn't match");
+                throw error;
+            }
+
+            const newJWT = this.createToken({email : user.email,id: user.id});
+            return newJWT;
+
         } catch (error) {
             console.log("Error in signIn in service layer");
             throw error;
         }
+    }
+
+    async isAuthenticated(token){
+        try {
+            const response = this.verifyToken(token);
+            if(!response){
+                throw {error : "Invalid token"}
+            }
+            const user = await this.userRepository.getById(response.id);
+            if(!user){
+                throw {error : "No user with the corresponding token exists"};
+            }
+            return user.id;
+        } catch (error) {
+            console.log("Error in isauthenticated in servic layer");
+            throw error;
+        }
+
     }
 
     createToken(user){
