@@ -18,6 +18,15 @@ class UserService {
         }
     }
 
+    async signIn(email,plainPassword){
+        try {
+            
+        } catch (error) {
+            console.log("Error in signIn in service layer");
+            throw error;
+        }
+    }
+
     createToken(user){
         try {
             const token = jwt.sign(user,JWT_KEY,{expiresIn : 60*60});

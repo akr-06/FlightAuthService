@@ -7,7 +7,7 @@ class UserRepository{
             return user;
         } catch (error) {
             console.log("error in user repository");
-            throw {error};
+            throw error;
         }
     }
 
@@ -21,17 +21,33 @@ class UserRepository{
             return true;
         } catch (error) {
             console.log("Error in repository layer in destroy");
-            throw {error};
+            throw error;
         }
     }
 
     async getById(userId){
         try {
-            const user = await User.findByPk(userId);
+            const user = await User.findByPk(userId, {
+                attributes : ['email','id']
+            });
             return user;
         } catch (error) {
             console.log("Error in getById in repository layer");
-            throw {error};
+            throw error;
+        }
+    }
+
+    async getByEmail(userEmail){
+        try {
+            const user = await User.findOne({
+                where : {
+                    email : userEmail
+                }
+            })
+            return user;
+        } catch (error) {
+            console.log("Error in getByEmail in repository layer");
+            throw error;
         }
     }
 }
